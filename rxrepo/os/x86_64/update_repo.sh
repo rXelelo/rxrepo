@@ -3,7 +3,7 @@
 rm rxrepo*
 
 echo "repo-add"
-repo-add -n -R rxrepo.db.tar.gz *.pkg.tar.zst
+repo-add --sign -n -R rxrepo.db.tar.gz *.pkg.tar.zst
 
 sleep 1
 
