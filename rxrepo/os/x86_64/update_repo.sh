@@ -15,6 +15,10 @@ mv rxrepo.db.tar.gz rxrepo.db
 
 mv rxrepo.files.tar.gz rxrepo.files
 
+mv rxrepo.db.tar.gz.sig mv rxrepo.db.sig
+
+mv rxrepo.files.tar.gz.sig rxrepo.files.sig
+
 echo "####################################"
 echo "Repo Updated!!"
 echo "####################################"
