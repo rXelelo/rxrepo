@@ -1,0 +1,2 @@
+rxrepo/os/x86_64/xmcl-launcher-0.50.5-1-x86_64.pkg.tar.zst filter=lfs diff=lfs merge=lfs -text
+rxrepo/os/x86_64/xmcl-launcher-0.50.5-1-x86_64.pkg.tar.zst.sig filter=lfs diff=lfs merge=lfs -text
