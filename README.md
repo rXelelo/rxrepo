@@ -4,7 +4,7 @@ Welckome to my own repo
 
 ## Tutorial how to install repo
 1. open using editor  /etc/pacman.conf
-2. add this stings
+2. add this strings
 ```
 [rxrepo]
 SigLevel = TrustAll
@@ -22,7 +22,8 @@ $ makepkg -s
 _before i will use $repo (repo name)_
 
 3. clone you repository 
-4. for example i use default tree
+4. for example i use default tree 'main'/rxrepo/os/x86_64
+but Tutorial for 'main'/x86_64
 ```
 $ mkdir x86_64 
 ```
