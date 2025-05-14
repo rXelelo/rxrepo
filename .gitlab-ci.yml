@@ -10,8 +10,6 @@ build_job:
     - pacman-key --recv-keys 102286012EAFCB1E
     - pacman-key --init
     - pacman-key --populate
-    - cd ./rxrepo/os/x86_64
-    - ls
     - chmod +x update_repo.sh
     - ./update_repo.sh
 
