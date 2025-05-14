@@ -6,9 +6,6 @@ stages:
 build_job:
   stage: build
   script:
-    - pacman-key --init
-    - pacman-key --populate
-    - pacman -Sy archlinux-keyring
     - gpg --recv-keys 102286012EAFCB1E
     - pacman-key --recv-keys 102286012EAFCB1E
     - pacman-key --init
