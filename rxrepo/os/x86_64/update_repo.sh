@@ -3,7 +3,7 @@
 rm rxrepo*
 
 echo "repo-add"
-repo-add --sign -n -R rxrepo.db.tar.gz *.pkg.tar.zst
+repo-add --sign --key 102286012EAFCB1E -n -R rxrepo.db.tar.gz *.pkg.tar.zst
 
 sleep 1
 
@@ -22,3 +22,4 @@ mv rxrepo.files.tar.gz.sig rxrepo.files.sig
 echo "####################################"
 echo "Repo Updated!!"
 echo "####################################"
+
