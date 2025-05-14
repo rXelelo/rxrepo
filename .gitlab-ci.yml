@@ -6,7 +6,8 @@ stages:
 build_job:
   stage: build
   script:
-    - pacman-key --recv-keys 4B7B4231920C4FA3EEFDB6D3102286012EAFCB1E
+    - gpg --recv-keys 102286012EAFCB1E
+    - pacman-key --recv-keys 102286012EAFCB1E
     - cd ./rxrepo/os/x86_64
     - ls
     - chmod +x update_repo.sh
