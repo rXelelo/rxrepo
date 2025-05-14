@@ -8,9 +8,10 @@ build_job:
   script:
     - gpg --recv-keys 102286012EAFCB1E
     - pacman-key --recv-keys 102286012EAFCB1E
+    - pacman-key --finger 102286012EAFCB1E
+    - pacman-key --lsign-key 102286012EAFCB1E
     - pacman-key --init
     - pacman-key --populate
-    - gpg --allow-weak-key-signatures
     - chmod +x update_repo.sh
     - ./update_repo.sh
 
