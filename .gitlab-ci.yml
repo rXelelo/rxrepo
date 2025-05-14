@@ -8,6 +8,6 @@ build_job:
   script:
     - cd ./rxrepo/os/x86_64
     - ls
-    - chmod +x ./rxrepo/os/x86_64/update.sh
-    - ./rxrepo/os/x86_64/update.sh
+    - chmod +x update_repo.sh
+    - ./update_repo.sh
 
