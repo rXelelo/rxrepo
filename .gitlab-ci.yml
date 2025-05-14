@@ -7,6 +7,7 @@ build_job:
   stage: build
   script:
     - cd ./rxrepo/os/x86_64
-    - chmod +x ./update.sh
+    - ls
+    - chmod +x update.sh
     - ./update.sh
 
