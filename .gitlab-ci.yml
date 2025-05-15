@@ -7,7 +7,7 @@ stages:
 sign_packages:
   stage: sign
   script:
-    - echo "$GPG_PRIVATE_KEY" | gpg --import --batch
+    - echo "$GPG_PRIVATE_KEY_BASE64" | base64 -d | gpg --import --batch
     - echo -e "5\ny\n" | gpg --command-fd 0 --edit-key $GPG_KEY_ID trust
     - mkdir -p ~/.gnupg
     - echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
@@ -27,6 +27,16 @@ deploy_repo:
   stage: deploy
   image: archlinux:latest
   script:
-    - ./update_repo.sh
+    - repo-add --sign --key "$GPG_KEY_ID" -n -R ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/*.pkg.tar.zst
+    - sleep 1
+    - rm ./rxrepo/os/x86_64/rxrepo.db
+    - rm ./rxrepo/os/x86_64/rxrepo.files
+    - mv ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/rxrepo.db
+    - mv ./rxrepo/os/x86_64/rxrepo.files.tar.gz ./rxrepo/os/x86_64/rxrepo.files
+    - mv ./rxrepo/os/x86_64/rxrepo.db.tar.gz.sig ./rxrepo/os/x86_64/rxrepo.db.sig
+    - mv ./rxrepo/os/x86_64/rxrepo.files.tar.gz.sig ./rxrepo/os/x86_64/rxrepo.files.sig
+    - echo "####################################"
+    - echo "Repo Updated!!"
+    - echo "####################################"
   only:
     - main
