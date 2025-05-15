@@ -8,8 +8,15 @@ sign_packages:
   stage: sign
   script:
     - pacman -Syu --noconfirm gnupg
+    - mkdir -p ~/.gnupg
+    - chmod 700 ~/.gnupg
+    - echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+    - echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+    - echo "no-tty" >> ~/.gnupg/gpg.conf
+    - echo "batch" >> ~/.gnupg/gpg.conf
+    - echo "yes" >> ~/.gnupg/gpg.conf
     - echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --import --batch
-    - echo -e "5\ny\n" | gpg --command-fd 0 --edit-key $GPG_KEY_ID trust
+    - echo -e "trust\n5\ny\nquit\n" | gpg --batch --command-fd 0 --no-tty --edit-key $GPG_KEY_ID
     - mkdir -p ~/.gnupg
     - echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
     - echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
