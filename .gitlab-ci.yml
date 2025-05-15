@@ -12,6 +12,7 @@ build_job:
     - pacman-key --init
     - pacman-key --populate
     - pacman-key --lsign-key 102286012EAFCB1E
+    - gpg --edit-key 102286012EAFCB1E trust quit
     - chmod +x update_repo.sh
     - ./update_repo.sh
 
