@@ -38,6 +38,7 @@ deploy_repo:
   stage: deploy
   image: archlinux:latest
   script:
+    - gpg --list-keys
     - repo-add --sign --key "$GPG_KEY_ID" -n -R ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/*.pkg.tar.zst
     - sleep 1
     - rm ./rxrepo/os/x86_64/rxrepo.db
