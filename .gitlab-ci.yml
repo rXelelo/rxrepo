@@ -23,7 +23,7 @@ sign_packages:
     - cd rxrepo/os/x86_64/
     - for pkg in *.pkg.tar.zst; do
     -   echo "Signing $pkg..."
-    -   gpg --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --use-agent -u "$GPG_KEY_ID" "$pkg"
+    -   gpg --batch --no-tty --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --use-agent -u "$GPG_KEY_ID" "$pkg"
     - done
     - chmod +x update_repo.sh
     - ./update_repo.sh
