@@ -21,15 +21,15 @@ sign_packages:
     - echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
     - echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
     - cd rxrepo/os/x86_64/
-    - echo "Checking for existing signature for $pkg..."
+    - for pkg in *.pkg.tar.zst; do
+    -   echo "Checking for existing signature for $pkg..."
     -   if [ -f "$pkg.sig" ]; then
     -     echo "Removing existing signature file..."
     -     rm -f "$pkg.sig"
     -   fi
     -   echo "Signing $pkg..."
     -   gpg --batch --no-tty --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --use-agent -u "$GPG_KEY_ID" "$pkg"
-    - chmod +x update_repo.sh
-    - ./update_repo.sh
+    - done
   artifacts:
     paths:
       - packages/
