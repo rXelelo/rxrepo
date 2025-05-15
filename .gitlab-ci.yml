@@ -1,18 +1,32 @@
 image: archlinux:latest
 
 stages:
-  - build
+  - sign
+  - deploy
 
-build_job:
-  stage: build
+sign_packages:
+  stage: sign
   script:
-    - gpg --recv-keys 102286012EAFCB1E
-    - pacman-key --recv-keys 102286012EAFCB1E
-    - pacman-key --finger 102286012EAFCB1E
-    - pacman-key --init
-    - pacman-key --populate
-    - pacman-key --lsign-key 102286012EAFCB1E
-    - gpg --no-tty --edit-key 102286012EAFCB1E trust quit
+    - echo "$GPG_PRIVATE_KEY" | gpg --import --batch
+    - echo -e "5\ny\n" | gpg --command-fd 0 --edit-key $GPG_KEY_ID trust
+    - mkdir -p ~/.gnupg
+    - echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+    - echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+    - cd rxrepo/os/x86_64/
+    - for pkg in *.pkg.tar.zst; do
+    -   echo "Signing $pkg..."
+    -   gpg --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --use-agent -u "$GPG_KEY_ID" "$pkg"
+    - done
     - chmod +x update_repo.sh
     - ./update_repo.sh
+  artifacts:
+    paths:
+      - packages/
 
+deploy_repo:
+  stage: deploy
+  image: archlinux:latest
+  script:
+    - ./update_repo.sh
+  only:
+    - main
