@@ -8,7 +8,7 @@ sign_packages:
   stage: sign
   script:
     - pacman -Syu --noconfirm gnupg
-    - echo "$GPG_PRIVATE_KEY_BASE64" | base64 -d | gpg --import --batch
+    - echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --import --batch
     - echo -e "5\ny\n" | gpg --command-fd 0 --edit-key $GPG_KEY_ID trust
     - mkdir -p ~/.gnupg
     - echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
