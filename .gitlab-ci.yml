@@ -1,11 +1,10 @@
 image: archlinux:latest
 
 stages:
-  - sign
-  - deploy
+  - update
 
 sign_packages:
-  stage: sign
+  stage: update
   script:
     - pacman -Syu --noconfirm gnupg
     - mkdir -p ~/.gnupg
@@ -30,15 +29,11 @@ sign_packages:
     -   echo "Signing $pkg..."
     -   gpg --batch --no-tty --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --use-agent -u "$GPG_KEY_ID" "$pkg"
     - done
-  artifacts:
-    paths:
-      - packages/
-
-deploy_repo:
-  stage: deploy
-  image: archlinux:latest
-  script:
     - gpg --list-keys
+    - cd ..
+    - cd ..
+    - cd ..
+    - ls
     - repo-add --sign --key "$GPG_KEY_ID" -n -R ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/*.pkg.tar.zst
     - sleep 1
     - rm ./rxrepo/os/x86_64/rxrepo.db
@@ -50,5 +45,3 @@ deploy_repo:
     - echo "####################################"
     - echo "Repo Updated!!"
     - echo "####################################"
-  only:
-    - main
