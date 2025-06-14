@@ -6,5 +6,5 @@ gpg --detach-sign --output sklauncher-bin-3.2.12-3-any.pkg.tar.zst.sig sklaunche
 gpg --detach-sign --output rustdesk-bin-1.3.9-1-x86_64.pkg.tar.zst.sig rustdesk-bin-1.3.9-1-x86_64.pkg.tar.zst
 gpg --detach-sign --output vesktop-bin-1.5.6-3-x86_64.pkg.tar.zst.sig vesktop-bin-1.5.6-3-x86_64.pkg.tar.zst
 gpg --detach-sign --output osu-mime-0.1-3-x86_64.pkg.tar.zst.sig osu-mime-0.1-3-x86_64.pkg.tar.zst
-
+gpg --detach-sign --output xmcl-launcher-0.51.1-1-x86_64.pkg.tar.zst.sig xmcl-launcher-0.51.1-1-x86_64.pkg.tar.zst
 

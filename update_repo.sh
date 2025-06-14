@@ -3,7 +3,7 @@
 rm rxrepo*
 
 echo "repo-add"
-repo-add --sign --key D05B13D6B60B928A6F7EF338E2EA827C91708A0C -n -R ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/*.pkg.tar.zst
+repo-add --sign --key F600BA22F0D90359 -n -R ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/*.pkg.tar.zst
 
 sleep 1
 
