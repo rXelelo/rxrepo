@@ -43,11 +43,6 @@ sign_packages:
     - echo "####################################"
     - mkdir -p public
     - cp -a rxrepo public/
-  artifacts:
-    paths:
-      - public
-  only:
-    - main
 
 pages:
   stage: update
