@@ -14,7 +14,7 @@ sign_packages:
     - echo "no-tty" >> ~/.gnupg/gpg.conf
     - echo "batch" >> ~/.gnupg/gpg.conf
     - echo "yes" >> ~/.gnupg/gpg.conf
-    - echo "$GPG_PRIVATE_KEY" | base64 -d | gpg --import --batch
+    - echo "$GPG_PRIV_KEY" | base64 -d | gpg --import --batch
     - echo -e "trust\n5\ny\nquit\n" | gpg --batch --command-fd 0 --no-tty --edit-key $GPG_KEY_ID
     - cd rxrepo/os/x86_64/
     - |
