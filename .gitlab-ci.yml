@@ -16,7 +16,7 @@ sign_packages:
     - echo "yes" >> ~/.gnupg/gpg.conf
     - echo "$GPG_PRIV_KEY" | base64 -d | gpg --import --batch
     - echo -e "trust\n5\ny\nquit\n" | gpg --batch --command-fd 0 --no-tty --edit-key $GPG_KEY_ID
-    - cd rxrepo/os/x86_64/
+    - cd public/rxrepo/os/x86_64/
     - |
       for pkg in *.pkg.tar.zst; do
         echo "Checking for existing signature for $pkg..."
@@ -28,7 +28,7 @@ sign_packages:
         gpg --batch --no-tty --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --use-agent -u "$GPG_KEY_ID" "$pkg"
       done
     - gpg --list-keys
-    - cd ../../..
+    - cd ../../../
     - ls
     - repo-add --sign --key "$GPG_KEY_ID" -n -R ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/*.pkg.tar.zst
     - sleep 1
