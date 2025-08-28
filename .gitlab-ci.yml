@@ -41,8 +41,6 @@ sign_packages:
     - echo "####################################"
     - echo "Repo Updated!!"
     - echo "####################################"
-    - mkdir -p public
-    - cp -a rxrepo public/
 
 pages:
   stage: update
