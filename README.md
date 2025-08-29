@@ -8,7 +8,7 @@ Welckome to my own repo
 ```
 [rxrepo]
 SigLevel = TrustAll
-Server = https://gitlab.com/rxelelo/$repo/-/raw/main/$repo/os/$arch
+Server = https://myrepo-3be578.gitlab.io/$repo/os/$arch
 ```
 
 ## Tutorial how to make same repo
