@@ -123,7 +123,7 @@ sign_packages:
         <p>Add the following to your <code>/etc/pacman.conf</code>:</p>
         <div class="code">
           <pre>[rxrepo]
-      Server = https://$CI_PROJECT_NAMESPACE.gitlab.io/$CI_PROJECT_NAME/rxrepo/os/x86_64</pre>
+      Server = https://rxelelo.gitlab.io/$repo/$repo/os/$arch</pre>
         </div>
         
         <h2>Repository Files</h2>
