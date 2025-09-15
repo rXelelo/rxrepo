@@ -1,55 +1,182 @@
 image: archlinux:latest
 
 stages:
-  - update
+  - build
+  - deploy
+
+variables:
+  # Improve GPG performance
+  GNUPGHOME: "$CI_PROJECT_DIR/.gnupg"
 
 sign_packages:
-  stage: update
-  script:
-    - pacman -Syu --noconfirm gnupg
-    - mkdir -p ~/.gnupg
-    - chmod 700 ~/.gnupg
-    - echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
-    - echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
-    - echo "no-tty" >> ~/.gnupg/gpg.conf
-    - echo "batch" >> ~/.gnupg/gpg.conf
-    - echo "yes" >> ~/.gnupg/gpg.conf
+  stage: build
+  before_script:
+    # Update system and install required packages
+    - pacman -Syu --noconfirm gnupg pacman-contrib
+    # Setup GPG directory
+    - mkdir -p "$GNUPGHOME"
+    - chmod 700 "$GNUPGHOME"
+    # Configure GPG for non-interactive use
+    - echo "allow-loopback-pinentry" > "$GNUPGHOME/gpg-agent.conf"
+    - echo "pinentry-mode loopback" > "$GNUPGHOME/gpg.conf"
+    - echo "no-tty" >> "$GNUPGHOME/gpg.conf"
+    - echo "batch" >> "$GNUPGHOME/gpg.conf"
+    - echo "yes" >> "$GNUPGHOME/gpg.conf"
+    # Import GPG key
     - echo "$GPG_PRIV_KEY" | base64 -d | gpg --import --batch
-    - echo -e "trust\n5\ny\nquit\n" | gpg --batch --command-fd 0 --no-tty --edit-key $GPG_KEY_ID
+    - echo -e "trust\n5\ny\nquit\n" | gpg --batch --command-fd 0 --no-tty --edit-key "$GPG_KEY_ID"
+  script:
+    # Ensure public directory structure exists
+    - mkdir -p public/rxrepo/os/x86_64/
+    
+    # Sign packages (only if they exist and don't already have valid signatures)
     - cd public/rxrepo/os/x86_64/
     - |
-      for pkg in *.pkg.tar.zst; do
-        echo "Checking for existing signature for $pkg..."
-        if [ -f "$pkg.sig" ]; then
-          echo "Removing existing signature file..."
-          rm -f "$pkg.sig"
+      if ls *.pkg.tar.zst 1> /dev/null 2>&1; then
+        for pkg in *.pkg.tar.zst; do
+          echo "Processing $pkg..."
+          
+          # Check if signature exists and is valid
+          if [ -f "$pkg.sig" ]; then
+            if gpg --verify "$pkg.sig" "$pkg" 2>/dev/null; then
+              echo "Valid signature exists for $pkg, skipping..."
+              continue
+            else
+              echo "Invalid signature found for $pkg, removing..."
+              rm -f "$pkg.sig"
+            fi
+          fi
+          
+          echo "Signing $pkg..."
+          gpg --batch --no-tty --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              --detach-sign --use-agent \
+              -u "$GPG_KEY_ID" "$pkg"
+        done
+      else
+        echo "No packages found to sign"
+        # Create a dummy file to ensure directory exists
+        echo "# RX Repository" > README.md
+      fi
+    
+    # Go back to project root
+    - cd "$CI_PROJECT_DIR"
+    
+    # Update repository database
+    - |
+      if ls public/rxrepo/os/x86_64/*.pkg.tar.zst 1> /dev/null 2>&1; then
+        echo "Updating repository database..."
+        repo-add --sign --key "$GPG_KEY_ID" -n -R \
+          ./public/rxrepo/os/x86_64/rxrepo.db.tar.gz \
+          ./public/rxrepo/os/x86_64/*.pkg.tar.zst
+        
+        # Clean up and rename database files
+        rm -f ./public/rxrepo/os/x86_64/rxrepo.db ./public/rxrepo/os/x86_64/rxrepo.files
+        
+        # Rename .tar.gz files to remove extension
+        if [ -f "./public/rxrepo/os/x86_64/rxrepo.db.tar.gz" ]; then
+          mv ./public/rxrepo/os/x86_64/rxrepo.db.tar.gz ./public/rxrepo/os/x86_64/rxrepo.db
         fi
-        echo "Signing $pkg..."
-        gpg --batch --no-tty --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --detach-sign --use-agent -u "$GPG_KEY_ID" "$pkg"
+        if [ -f "./public/rxrepo/os/x86_64/rxrepo.files.tar.gz" ]; then
+          mv ./public/rxrepo/os/x86_64/rxrepo.files.tar.gz ./public/rxrepo/os/x86_64/rxrepo.files
+        fi
+        
+        # Move signature files
+        if [ -f "./public/rxrepo/os/x86_64/rxrepo.db.tar.gz.sig" ]; then
+          mv ./public/rxrepo/os/x86_64/rxrepo.db.tar.gz.sig ./public/rxrepo/os/x86_64/rxrepo.db.sig
+        fi
+        if [ -f "./public/rxrepo/os/x86_64/rxrepo.files.tar.gz.sig" ]; then
+          mv ./public/rxrepo/os/x86_64/rxrepo.files.tar.gz.sig ./public/rxrepo/os/x86_64/rxrepo.files.sig
+        fi
+        
+        echo "Repository database updated successfully!"
+      else
+        echo "No packages found, creating empty repository structure..."
+        touch ./public/rxrepo/os/x86_64/.gitkeep
+      fi
+    
+    # Create repository index page
+    - |
+      cat > public/index.html << 'EOF'
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>RX Arch Repository</title>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; }
+          .header { color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
+          .code { background: #f4f4f4; padding: 10px; margin: 10px 0; border-radius: 4px; }
+          pre { margin: 0; }
+          .file-list { margin: 20px 0; }
+          .file-list a { display: block; padding: 5px 0; text-decoration: none; }
+          .file-list a:hover { background: #f0f0f0; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>RX Arch Repository</h1>
+          <p>Custom Arch Linux package repository</p>
+        </div>
+        
+        <h2>Usage</h2>
+        <p>Add the following to your <code>/etc/pacman.conf</code>:</p>
+        <div class="code">
+          <pre>[rxrepo]
+      Server = https://$CI_PROJECT_NAMESPACE.gitlab.io/$CI_PROJECT_NAME/rxrepo/os/x86_64</pre>
+        </div>
+        
+        <h2>Repository Files</h2>
+        <div class="file-list">
+      EOF
+      
+      # Add links to repository files
+      find public/rxrepo -type f -name "*.pkg.tar.zst" -o -name "*.sig" -o -name "rxrepo.db*" -o -name "rxrepo.files*" | \
+        sort | while read file; do
+        relative_path=${file#public/}
+        filename=$(basename "$file")
+        echo "    <a href=\"$relative_path\">$filename</a>" >> public/index.html
       done
-    - gpg --list-keys
-    - cd ../../../
-    - ls
-    - repo-add --sign --key "$GPG_KEY_ID" -n -R ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/*.pkg.tar.zst
-    - sleep 1
-    - rm ./rxrepo/os/x86_64/rxrepo.db
-    - rm ./rxrepo/os/x86_64/rxrepo.files
-    - mv ./rxrepo/os/x86_64/rxrepo.db.tar.gz ./rxrepo/os/x86_64/rxrepo.db
-    - mv ./rxrepo/os/x86_64/rxrepo.files.tar.gz ./rxrepo/os/x86_64/rxrepo.files
-    - mv ./rxrepo/os/x86_64/rxrepo.db.tar.gz.sig ./rxrepo/os/x86_64/rxrepo.db.sig
-    - mv ./rxrepo/os/x86_64/rxrepo.files.tar.gz.sig ./rxrepo/os/x86_64/rxrepo.files.sig
+      
+      echo "  </div>" >> public/index.html
+      echo "  <p><small>Last updated: $(date)</small></p>" >> public/index.html
+      echo "</body></html>" >> public/index.html
+    
+    # Display summary
     - echo "####################################"
-    - echo "Repo Updated!!"
+    - echo "Repository build completed!"
+    - echo "Files in public directory:"
+    - find public -type f | sort
     - echo "####################################"
-
-pages:
-  stage: update
-  script:
-    - echo "Deploying pages..."
-  dependencies:
-    - sign_packages
+    
   artifacts:
     paths:
-      - public
+      - public/
+    expire_in: 1 week
   only:
     - main
+
+# GitLab Pages deployment
+pages:
+  stage: deploy
+  dependencies:
+    - sign_packages
+  script:
+    - echo "Deploying repository to GitLab Pages..."
+    - echo "Repository will be available at:"
+    - echo "https://$CI_PROJECT_NAMESPACE.gitlab.io/$CI_PROJECT_NAME"
+    - echo ""
+    - echo "Add this to /etc/pacman.conf:"
+    - echo "[rxrepo]"
+    - echo "Server = https://$CI_PROJECT_NAMESPACE.gitlab.io/$CI_PROJECT_NAME/rxrepo/os/x86_64"
+    - echo ""
+    - echo "Files being deployed:"
+    - find public -name "*.pkg.tar.zst" -o -name "*.sig" -o -name "rxrepo.db*" -o -name "rxrepo.files*" | sort
+  artifacts:
+    paths:
+      - public/
+  only:
+    - main
+  environment:
+    name: production
+    url: https://$CI_PROJECT_NAMESPACE.gitlab.io/$CI_PROJECT_NAME
