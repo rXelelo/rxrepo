@@ -6,9 +6,14 @@ Welckome to my own repo
 1. open using editor  /etc/pacman.conf
 2. add this strings
 ```
+#GitLab
 [rxrepo]
 SigLevel = TrustAll
-Server = https://myrepo-3be578.gitlab.io/$repo/os/$arch
+Server = https://rxelelo.gitlab.io/$repo/$repo/os/$arch
+#GitHub
+[rxrepo]
+SigLevel = TrustAll
+Server = https://rxelelo.github.io/$repo/public/$repo/os/$arch
 ```
 
 ## Tutorial how to make same repo
