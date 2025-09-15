@@ -1,0 +1,16 @@
+# Maintainer: Rain Xelelo <rxelelo@outlook.com>
+
+pkgname=rxrepo
+pkgver=1.0
+pkgrel=1
+pkgdesc="repository by rXelelo"
+arch=('x86_64')
+url="https://rxelelo.github.io/rxrepo/"
+license=()
+
+source=("https://rxelelo.gitlab.io/rxrepo/rxrepopkg/rxrepo-mirrorlist")
+sha256sums=('SKIP')
+package() {
+    install -dm0755 "$pkgdir/etc/pacman.d/"
+    install -Dm0644 "$srcdir/rxrepo-mirrorlist" "$pkgdir/etc/pacman.d/"
+}

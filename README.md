@@ -6,11 +6,10 @@ Welckome to my own repo
 1. open using editor  /etc/pacman.conf
 2. add this strings
 ```
-#GitLab
-[rxrepo]
-SigLevel = TrustAll
-Server = https://rxelelo.gitlab.io/$repo/$repo/os/$arch
-#GitHub
+$ wget https://rxelelo.gitlab.io/rxrepo/rxrepopkg/PKGBUILD
+$ makepkg -is
+$ sudo nano /etc/pacman.conf
+# add this
 [rxrepo]
 SigLevel = TrustAll
 Server = https://rxelelo.github.io/$repo/public/$repo/os/$arch
