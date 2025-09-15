@@ -1,0 +1,2 @@
+Server = https://rxelelo.gitlab.io/$repo/$repo/os/$arch
+Server = https://rxelelo.github.io/$repo/public/$repo/os/$arch
